@@ -55,30 +55,32 @@ base.add(brazo);
 const antebrazo = new THREE.Group();
 const discoGeometry = new THREE.CylinderGeometry(22, 22, 6, 32);
 const disco = new THREE.LineSegments(new THREE.WireframeGeometry(discoGeometry), material);
-disco.position.set(0, 140, 0); // Posicionar el cilindro
+disco.position.set(0, 0, 0); // Posicionar el cilindro
 
 const nerviosGeometry = new THREE.BoxGeometry(4, 80, 4);
 const nervio1 = new THREE.LineSegments(new THREE.WireframeGeometry(nerviosGeometry), material);
-nervio1.position.set(8, 180, 8); // Posicionar el cilindro
+nervio1.position.set(8, 40, 8); // Posicionar el cilindro
 const nervio2 = new THREE.LineSegments(new THREE.WireframeGeometry(nerviosGeometry), material);
-nervio2.position.set(-8, 180, 8); // Posicionar el cilindro
+nervio2.position.set(-8, 40, 8); // Posicionar el cilindro
 const nervio3 = new THREE.LineSegments(new THREE.WireframeGeometry(nerviosGeometry), material);
-nervio3.position.set(8, 180, -8); // Posicionar el cilindro
+nervio3.position.set(8, 40, -8); // Posicionar el cilindro
 const nervio4 = new THREE.LineSegments(new THREE.WireframeGeometry(nerviosGeometry), material);
-nervio4.position.set(-8, 180, -8); // Posicionar el cilindro
+nervio4.position.set(-8, 40, -8); // Posicionar el cilindro
 
 const grupoMano = new THREE.Group();
 const manoGeometry = new THREE.CylinderGeometry(15, 15, 40, 32);
 const mano = new THREE.LineSegments(new THREE.WireframeGeometry(manoGeometry), material);
-mano.position.set(0, 220, 0);
+mano.position.set(0, 80, 0);
 mano.rotation.z = Math.PI / 2;
 grupoMano.add(mano);
 
 // Pinzas (left and right)
+// const pinzaIzq = new THREE.Group()
 const pinzaIzqSquareGeometry = new THREE.BoxGeometry(19, 20, 4);
 const pinzaIzqSquare = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaIzqSquareGeometry), material);
-pinzaIzqSquare.position.set(10, 220, 10);
+pinzaIzqSquare.position.set(10, 80, 10);
 pinzaIzqSquare.rotation.y = Math.PI / 2;
+// pinzaIzq.add(pinzaIzqSquare);
 
 const pinzaParallelipipedIzqGeometry = new THREE.BufferGeometry();
 const verticesPinzaIzq = new Float32Array([
@@ -151,7 +153,7 @@ pinzaParallelipipedIzqGeometry.setIndex(new THREE.BufferAttribute(indicesPinzaIz
 
 
 const pinzaParallelipipedIzq = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaParallelipipedIzqGeometry), material);
-pinzaParallelipipedIzq.position.set(12, 210, 38.5); // Posicionar el triángulo
+pinzaParallelipipedIzq.position.set(12, 80, 38.5); // Posicionar el triángulo
 pinzaParallelipipedIzq.rotation.y = Math.PI / 2;
 
 grupoMano.add(pinzaIzqSquare);
@@ -159,14 +161,14 @@ grupoMano.add(pinzaParallelipipedIzq);
 
 const pinzaDerSquareGeometry = new THREE.BoxGeometry(19, 20, 4);
 const pinzaDerSquare = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaDerSquareGeometry), material);
-pinzaDerSquare.position.set(-10, 220, 10);
+pinzaDerSquare.position.set(-10, 80, 10);
 pinzaDerSquare.rotation.y = Math.PI / 2;
 
 const pinzaParallelipipedDer = pinzaParallelipipedIzq.clone();
 pinzaParallelipipedDer.rotation.y = -Math.PI / 2;
 pinzaParallelipipedDer.rotation.x = -Math.PI;
 
-pinzaParallelipipedDer.position.set(-12, 230, 38.5);
+pinzaParallelipipedDer.position.set(-12, 80, 38.5);
 
 grupoMano.add(pinzaDerSquare);
 grupoMano.add(pinzaParallelipipedDer);
@@ -179,7 +181,8 @@ antebrazo.add(nervio4);
 antebrazo.add(grupoMano);
 
 robot.add(brazo);
-brazo.add(antebrazo);
+// brazo.add(antebrazo);
+rotula.add(antebrazo);
 // robot.add(antebrazo);
 scene.add(robot);
 
@@ -221,8 +224,9 @@ gui.add(robotControls, 'giroAntebrazoY', -180, 180).onChange((value) => {
   antebrazo.rotation.y = THREE.MathUtils.degToRad(value);
 });
 gui.add(robotControls, 'giroAntebrazoZ', -90, 90).onChange((value) => {
-  rotula.rotation.z = THREE.MathUtils.degToRad(value);
+  rotula.rotation.z = THREE.MathUtils.degToRad(value);  // Rotar el grupo de la rótula
 });
+
 gui.add(robotControls, 'giroPinza', -40, 220).onChange((value) => {
   mano.rotation.x = THREE.MathUtils.degToRad(value);
 });
