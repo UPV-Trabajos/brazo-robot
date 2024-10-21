@@ -1,11 +1,18 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Importar OrbitControls
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import GUI from 'lil-gui';
+import TWEEN from '@tweenjs/tween.js';
+
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+// AxesHelper para visualizar los ejes X, Y y Z
+const axesHelper = new THREE.AxesHelper(100);  // Añadir el helper de los ejes
+scene.add(axesHelper);
 
 // Piso
 const floorGeometry = new THREE.PlaneGeometry(1000, 1000);
@@ -25,7 +32,6 @@ robot.add(base);
 
 // Brazo
 const brazo = new THREE.Group();
-
 const ejeGeometry = new THREE.CylinderGeometry(20, 20, 18, 32);
 const eje = new THREE.LineSegments(new THREE.WireframeGeometry(ejeGeometry), material);
 eje.position.set(0, 21, 0); // Posicionar el cilindro
@@ -43,10 +49,10 @@ rotula.position.set(0, 140, 0); // Posicionar el cilindro
 brazo.add(eje);
 brazo.add(esparrago);
 brazo.add(rotula);
+base.add(brazo);
 
 // Antebrazo
 const antebrazo = new THREE.Group();
-
 const discoGeometry = new THREE.CylinderGeometry(22, 22, 6, 32);
 const disco = new THREE.LineSegments(new THREE.WireframeGeometry(discoGeometry), material);
 disco.position.set(0, 140, 0); // Posicionar el cilindro
@@ -68,6 +74,7 @@ mano.position.set(0, 220, 0);
 mano.rotation.z = Math.PI / 2;
 grupoMano.add(mano);
 
+// Pinzas (left and right)
 const pinzaIzqSquareGeometry = new THREE.BoxGeometry(19, 20, 4);
 const pinzaIzqSquare = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaIzqSquareGeometry), material);
 pinzaIzqSquare.position.set(10, 220, 10);
@@ -172,16 +179,67 @@ antebrazo.add(nervio4);
 antebrazo.add(grupoMano);
 
 robot.add(brazo);
-robot.add(antebrazo);
+brazo.add(antebrazo);
+// robot.add(antebrazo);
 scene.add(robot);
 
 camera.position.set(0, 400, 280);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+// Add GUI
+const gui = new GUI();
+const robotControls = {
+  giroBase: 0,
+  giroBrazo: 0,
+  giroAntebrazoY: 0,
+  giroAntebrazoZ: 0,
+  giroPinza: 0,
+  separacionPinza: 10,
+  alambres: false,
+  animar() {
+    // Use TWEEN to create a smooth animation
+    const baseRotation = { rotation: robot.rotation.y };
+    new TWEEN.Tween(baseRotation)
+      .to({ rotation: Math.PI * 2 }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(() => {
+        robot.rotation.y = baseRotation.rotation;
+      })
+      .start();
+  }
+};
+
+gui.add(robotControls, 'giroBase', -180, 180).onChange((value) => {
+  robot.rotation.y = THREE.MathUtils.degToRad(value);
+});
+gui.add(robotControls, 'giroBrazo', -45, 45).onChange((value) => {
+  brazo.rotation.x = THREE.MathUtils.degToRad(value);
+});
+
+gui.add(robotControls, 'giroAntebrazoY', -180, 180).onChange((value) => {
+  antebrazo.rotation.y = THREE.MathUtils.degToRad(value);
+});
+gui.add(robotControls, 'giroAntebrazoZ', -90, 90).onChange((value) => {
+  rotula.rotation.z = THREE.MathUtils.degToRad(value);
+});
+gui.add(robotControls, 'giroPinza', -40, 220).onChange((value) => {
+  mano.rotation.x = THREE.MathUtils.degToRad(value);
+});
+gui.add(robotControls, 'separacionPinza', 0, 15).onChange((value) => {
+  pinzaIzqSquare.position.x = 10 + value / 2;
+  pinzaDerSquare.position.x = -10 - value / 2;
+});
+gui.add(robotControls, 'alambres').onChange((value) => {
+  material.wireframe = value;
+});
+gui.add(robotControls, 'animar').name('Animar');
+
+// Animation loop
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+  TWEEN.update();
   renderer.render(scene, camera);
 }
 
