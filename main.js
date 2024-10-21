@@ -153,7 +153,7 @@ pinzaParallelipipedIzqGeometry.setIndex(new THREE.BufferAttribute(indicesPinzaIz
 
 
 const pinzaParallelipipedIzq = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaParallelipipedIzqGeometry), material);
-pinzaParallelipipedIzq.position.set(12, 80, 38.5); // Posicionar el triángulo
+pinzaParallelipipedIzq.position.set(12, 70, 38.5); // Posicionar el triángulo
 pinzaParallelipipedIzq.rotation.y = Math.PI / 2;
 
 grupoMano.add(pinzaIzqSquare);
@@ -168,7 +168,7 @@ const pinzaParallelipipedDer = pinzaParallelipipedIzq.clone();
 pinzaParallelipipedDer.rotation.y = -Math.PI / 2;
 pinzaParallelipipedDer.rotation.x = -Math.PI;
 
-pinzaParallelipipedDer.position.set(-12, 80, 38.5);
+pinzaParallelipipedDer.position.set(-12, 90, 38.5);
 
 grupoMano.add(pinzaDerSquare);
 grupoMano.add(pinzaParallelipipedDer);
