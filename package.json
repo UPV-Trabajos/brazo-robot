@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,6 +16,6 @@
     "three": "^0.140.2"
   },
   "devDependencies": {
-    "vite": "^5.4.7"
+    "vite": "^5.4.9"
   }
 }
