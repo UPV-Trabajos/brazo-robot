@@ -72,15 +72,15 @@ const manoGeometry = new THREE.CylinderGeometry(15, 15, 40, 32);
 const mano = new THREE.LineSegments(new THREE.WireframeGeometry(manoGeometry), material);
 mano.position.set(0, 80, 0);
 mano.rotation.z = Math.PI / 2;
-grupoMano.add(mano);
+// grupoMano.add(mano);
 
 // Pinzas (left and right)
-// const pinzaIzq = new THREE.Group()
+const pinzaIzq = new THREE.Group()
 const pinzaIzqSquareGeometry = new THREE.BoxGeometry(19, 20, 4);
 const pinzaIzqSquare = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaIzqSquareGeometry), material);
-pinzaIzqSquare.position.set(10, 80, 10);
-pinzaIzqSquare.rotation.y = Math.PI / 2;
-// pinzaIzq.add(pinzaIzqSquare);
+pinzaIzqSquare.position.set(0, -10, 10);  // En el extremo izquierdo del cilindro
+pinzaIzqSquare.rotation.x = Math.PI / 2;
+pinzaIzq.add(pinzaIzqSquare);
 
 const pinzaParallelipipedIzqGeometry = new THREE.BufferGeometry();
 const verticesPinzaIzq = new Float32Array([
@@ -153,32 +153,36 @@ pinzaParallelipipedIzqGeometry.setIndex(new THREE.BufferAttribute(indicesPinzaIz
 
 
 const pinzaParallelipipedIzq = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaParallelipipedIzqGeometry), material);
-pinzaParallelipipedIzq.position.set(12, 70, 38.5); // Posicionar el triángulo
-pinzaParallelipipedIzq.rotation.y = Math.PI / 2;
+pinzaParallelipipedIzq.position.set(10, -8, 38.5); // Posicionar el triángulo
+pinzaParallelipipedIzq.rotation.z = Math.PI / 2;
+pinzaParallelipipedIzq.rotation.x = -Math.PI / 2;
 
-grupoMano.add(pinzaIzqSquare);
-grupoMano.add(pinzaParallelipipedIzq);
+pinzaIzq.add(pinzaParallelipipedIzq);
 
+mano.add(pinzaIzq);
+
+const pinzaDer = new THREE.Group()
 const pinzaDerSquareGeometry = new THREE.BoxGeometry(19, 20, 4);
 const pinzaDerSquare = new THREE.LineSegments(new THREE.WireframeGeometry(pinzaDerSquareGeometry), material);
-pinzaDerSquare.position.set(-10, 80, 10);
-pinzaDerSquare.rotation.y = Math.PI / 2;
+pinzaDerSquare.position.set(0, 10, 10);
+pinzaDerSquare.rotation.x = Math.PI / 2;
+
+pinzaDer.add(pinzaDerSquare);
 
 const pinzaParallelipipedDer = pinzaParallelipipedIzq.clone();
-pinzaParallelipipedDer.rotation.y = -Math.PI / 2;
-pinzaParallelipipedDer.rotation.x = -Math.PI;
+pinzaParallelipipedDer.position.set(10, 12, 38.5);
 
-pinzaParallelipipedDer.position.set(-12, 90, 38.5);
 
-grupoMano.add(pinzaDerSquare);
-grupoMano.add(pinzaParallelipipedDer);
+pinzaDer.add(pinzaParallelipipedDer);
+
+mano.add(pinzaDer);
 
 antebrazo.add(disco);
 antebrazo.add(nervio1);
 antebrazo.add(nervio2);
 antebrazo.add(nervio3);
 antebrazo.add(nervio4);
-antebrazo.add(grupoMano);
+antebrazo.add(mano);
 
 robot.add(brazo);
 // brazo.add(antebrazo);
@@ -224,16 +228,18 @@ gui.add(robotControls, 'giroAntebrazoY', -180, 180).onChange((value) => {
   antebrazo.rotation.y = THREE.MathUtils.degToRad(value);
 });
 gui.add(robotControls, 'giroAntebrazoZ', -90, 90).onChange((value) => {
-  rotula.rotation.z = THREE.MathUtils.degToRad(value);  // Rotar el grupo de la rótula
+  rotula.rotation.x = THREE.MathUtils.degToRad(value);  // Rotar el grupo de la rótula
 });
 
 gui.add(robotControls, 'giroPinza', -40, 220).onChange((value) => {
-  mano.rotation.x = THREE.MathUtils.degToRad(value);
+  mano.rotation.x = THREE.MathUtils.degToRad(-value);  // Invertir la dirección del giro
 });
 gui.add(robotControls, 'separacionPinza', 0, 15).onChange((value) => {
-  pinzaIzqSquare.position.x = 10 + value / 2;
-  pinzaDerSquare.position.x = -10 - value / 2;
+  pinzaIzq.position.y = -10 + value;   // Ajusta la separación en el eje Z
+  pinzaDer.position.y = 10 - value;   // Ajusta la separación en el eje Z en dirección opuesta
 });
+
+
 gui.add(robotControls, 'alambres').onChange((value) => {
   material.wireframe = value;
 });
