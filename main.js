@@ -10,8 +10,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Piso
-const floorSize = 1000;  // Tamaño del piso
-const halfFloorSize = floorSize / 2;  // Usamos este valor para definir los límites
+const floorSize = 1000;
+const halfFloorSize = floorSize / 2;
 const floorGeometry = new THREE.PlaneGeometry(floorSize, floorSize);
 const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -180,14 +180,82 @@ const robotControls = {
   separacionPinza: 10,
   alambres: false,
   animar() {
-    const baseRotation = { rotation: robot.rotation.y };
-    new TWEEN.Tween(baseRotation)
-      .to({ rotation: baseRotation.rotation + Math.PI * 2 }, 2000)
+    // Tomar los valores actuales y los límites de cada control desde la GUI
+    const baseRotationMin = THREE.MathUtils.degToRad(-180);
+    const baseRotationMax = THREE.MathUtils.degToRad(180);
+    const brazoRotationMin = THREE.MathUtils.degToRad(-45);
+    const brazoRotationMax = THREE.MathUtils.degToRad(45);
+    const antebrazoRotationYMin = THREE.MathUtils.degToRad(-180);
+    const antebrazoRotationYMax = THREE.MathUtils.degToRad(180);
+    const antebrazoRotationZMin = THREE.MathUtils.degToRad(-90);
+    const antebrazoRotationZMax = THREE.MathUtils.degToRad(90);
+    const manoRotationMin = THREE.MathUtils.degToRad(-90);
+    const manoRotationMax = THREE.MathUtils.degToRad(90);
+    const pinzaRotationMin = THREE.MathUtils.degToRad(-40);
+    const pinzaRotationMax = THREE.MathUtils.degToRad(220);
+    const separacionPinzaMin = 0;
+    const separacionPinzaMax = 15;
+
+    // Animación de la base
+    const baseTween = new TWEEN.Tween(robot.rotation)
+      .to({ y: baseRotationMax }, 2000)
       .easing(TWEEN.Easing.Quadratic.Out)
-      .onUpdate(() => {
-        robot.rotation.y = baseRotation.rotation;
-      })
-      .start();
+      .repeat(Infinity)
+      .yoyo(true);
+
+    // Animación del brazo
+    const brazoTween = new TWEEN.Tween(brazo.rotation)
+      .to({ x: brazoRotationMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true);
+
+    // Animación del antebrazo
+    const antebrazoTweenY = new TWEEN.Tween(antebrazo.rotation)
+      .to({ y: antebrazoRotationYMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true);
+
+    const antebrazoTweenZ = new TWEEN.Tween(rotula.rotation)
+      .to({ x: antebrazoRotationZMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true);
+
+    // Animación del cilindro (mano) en el eje x (igual que giroPinza)
+    const manoTween = new TWEEN.Tween(mano.rotation)
+      .to({ x: pinzaRotationMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true);
+
+    // Animación del giro de la pinza
+    const giroPinzaTween = new TWEEN.Tween(mano.rotation)
+      .to({ x: pinzaRotationMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true);
+
+    // Animación de la apertura de la pinza (separación)
+    const separacionPinzaTween = new TWEEN.Tween({ separacion: separacionPinzaMin })
+      .to({ separacion: separacionPinzaMax }, 2000)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .repeat(Infinity)
+      .yoyo(true)
+      .onUpdate(({ separacion }) => {
+        pinzaIzq.position.y = -10 + separacion;
+        pinzaDer.position.y = 10 - separacion;
+      });
+
+    // Iniciar las animaciones
+    baseTween.start();
+    brazoTween.start();
+    antebrazoTweenY.start();
+    antebrazoTweenZ.start();
+    manoTween.start(); // Animación del cilindro en el eje x
+    giroPinzaTween.start();
+    separacionPinzaTween.start();
   }
 };
 
